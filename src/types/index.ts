@@ -1,4 +1,4 @@
-export type AuthRole = 'public' | 'staff' | 'super_admin';
+export type AuthRole = 'public' | 'staff' | 'super_admin' | 'developer';
 
 export type Gender = 'male' | 'female' | 'other';
 export type PatientStatus = 'admitted' | 'discharged';

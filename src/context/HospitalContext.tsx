@@ -8,6 +8,7 @@ import {
 } from '../types';
 
 export const STAFF_PASSCODE = '1234';
+export const DEVELOPER_PASSCODE = '9999';
 export const SUPER_ADMIN_CREDENTIALS = {
   email: 'admin@medicore.com',
   password: 'admin'
@@ -17,6 +18,7 @@ interface HospitalContextType {
   authRole: AuthRole;
   loginAsStaff: (pass: string) => boolean;
   loginAsSuperAdmin: (email: string, pass: string) => boolean;
+  loginAsDeveloper: (pass: string) => boolean;
   logout: () => void;
   
   // Data State
@@ -136,8 +138,18 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return false;
   };
 
+  const loginAsDeveloper = (pass: string): boolean => {
+    if (pass.trim() === DEVELOPER_PASSCODE || pass.trim() === 'dev1234') {
+      setAuthRole('developer');
+      addAuditLog('DEVELOPER_LOGIN', 'ডেভেলপার সফলভাবে সিস্টেম কন্ট্রোল প্যানেলে প্রবেশ করেছেন।');
+      return true;
+    }
+    return false;
+  };
+
   const logout = () => {
-    addAuditLog('LOGOUT', `${authRole === 'super_admin' ? 'Super Admin' : 'Staff 1'} সাইনআউট করেছেন।`);
+    const roleName = authRole === 'super_admin' ? 'Super Admin' : authRole === 'developer' ? 'Developer' : 'Staff 1';
+    addAuditLog('LOGOUT', `${roleName} সাইনআউট করেছেন।`);
     setAuthRole('public');
   };
 
@@ -358,6 +370,7 @@ export const HospitalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       authRole,
       loginAsStaff,
       loginAsSuperAdmin,
+      loginAsDeveloper,
       logout,
       patients,
       medicines,

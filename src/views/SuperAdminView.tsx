@@ -8,9 +8,6 @@ import {
   Trash2, 
   Plus, 
   Minus, 
-  Download, 
-  Upload, 
-  RefreshCw, 
   AlertTriangle, 
   CheckCircle, 
   Search,
@@ -19,8 +16,7 @@ import {
   Lock,
   ExternalLink,
   Activity,
-  Heart,
-  Database
+  Heart
 } from 'lucide-react';
 import { useHospital } from '../context/HospitalContext';
 import { Medicine, DeliveryRecord, MedicineCategory, Gender } from '../types';
@@ -41,10 +37,6 @@ export const SuperAdminView: React.FC = () => {
     deletePatient,
     addDelivery,
     deleteDelivery,
-    factoryResetData,
-    loadSampleHospitalData,
-    exportDatabaseJSON,
-    importDatabaseJSON,
     totalMedicines,
     lowStockMedicines,
     cSectionCount,
@@ -53,7 +45,7 @@ export const SuperAdminView: React.FC = () => {
     dischargedCount
   } = useHospital();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'medicines' | 'patients' | 'deliveries' | 'audit' | 'backup'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'medicines' | 'patients' | 'deliveries' | 'audit'>('overview');
   const [search, setSearch] = useState('');
 
   // Modals for Admin
@@ -101,9 +93,6 @@ export const SuperAdminView: React.FC = () => {
   const [delBabyHealth, setDelBabyHealth] = useState<'healthy' | 'under_observation' | 'nicu_required'>('healthy');
   const [delNotes, setDelNotes] = useState('মা ও নবজাতক সুস্থ');
 
-  // JSON Import state
-  const [importJsonText, setImportJsonText] = useState('');
-  const [importStatus, setImportStatus] = useState<string | null>(null);
 
   // Submit Medicine
   const handleCreateMedicine = (e: React.FormEvent) => {
@@ -173,21 +162,6 @@ export const SuperAdminView: React.FC = () => {
     setIsDeliveryModalOpen(false);
   };
 
-  // JSON Import handler
-  const handleImport = () => {
-    setImportStatus(null);
-    if (!importJsonText.trim()) {
-      setImportStatus('অনুগ্রহ করে ব্যাকআপ JSON ডাটা পেস্ট করুন।');
-      return;
-    }
-    const success = importDatabaseJSON(importJsonText.trim());
-    if (success) {
-      setImportStatus('সফলভাবে ডাটাবেজ ব্যাকআপ ইমপোর্ট সম্পন্ন হয়েছে!');
-      setImportJsonText('');
-    } else {
-      setImportStatus('ভুল JSON ফরম্যাট! ব্যাকআপ ফাইল চেক করুন।');
-    }
-  };
 
   // Filters
   const filteredMedicines = medicines.filter(m => 
@@ -233,7 +207,7 @@ export const SuperAdminView: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-1">
-              ওষুধের স্টক, ভর্তি ও রিলিজ হওয়া রোগী, সিজার ও ডেলিভারি এবং ব্যাকআপ কন্ট্রোল
+              ওষুধের স্টক, ভর্তি ও রিলিজ হওয়া রোগী এবং সিজার ও প্রসব রেকর্ড সম্পূর্ণ পরিচালনা
             </p>
           </div>
         </div>
@@ -314,18 +288,6 @@ export const SuperAdminView: React.FC = () => {
           <History className="w-4 h-4" />
           <span>অডিট লগ ({auditLogs.length})</span>
         </button>
-
-        <button
-          onClick={() => { setActiveTab('backup'); setSearch(''); }}
-          className={`flex-1 py-3 px-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
-            activeTab === 'backup' 
-              ? 'bg-slate-900 text-white shadow-sm' 
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-          }`}
-        >
-          <Database className="w-4 h-4" />
-          <span>ব্যাকআপ ও রিস্টোর</span>
-        </button>
       </div>
 
       {/* Low stock alert banner */}
@@ -376,59 +338,6 @@ export const SuperAdminView: React.FC = () => {
               <span className="text-slate-500 text-[11px] font-bold block">স্বাভাবিক প্রসব</span>
               <span className="text-2xl font-black text-teal-600">{normalCount}</span>
               <span className="text-[10px] text-teal-700 font-bold block mt-1">Normal Delivery</span>
-            </div>
-          </div>
-
-          {/* Quick System Tools */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-2xs">
-            <h3 className="text-sm font-black text-slate-900 mb-3 flex items-center space-x-2">
-              <Database className="w-4 h-4 text-slate-700" />
-              <span>সুপার এডমিন কুইক টুলস ও ব্যাকআপ</span>
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button
-                onClick={exportDatabaseJSON}
-                className="p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-left transition-all cursor-pointer"
-              >
-                <div className="flex items-center space-x-2 text-slate-900 font-bold text-xs mb-1">
-                  <Download className="w-4 h-4 text-blue-600" />
-                  <span>সম্পূর্ণ ডাটাবেজ ডাউনলোড (JSON)</span>
-                </div>
-                <p className="text-[11px] text-slate-500">
-                  সকল ওষুধ, রোগী ও প্রসব রেকর্ড ১-ক্লিকে সেভ করুন
-                </p>
-              </button>
-
-              <button
-                onClick={loadSampleHospitalData}
-                className="p-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-2xl text-left transition-all cursor-pointer"
-              >
-                <div className="flex items-center space-x-2 text-slate-900 font-bold text-xs mb-1">
-                  <RefreshCw className="w-4 h-4 text-emerald-600" />
-                  <span>হাসপাতাল ডেমো ডাটা লোড করুন</span>
-                </div>
-                <p className="text-[11px] text-slate-500">
-                  পরীক্ষার সুবিধার্থে আদর্শ হাসপাতালের ডাটা সেট লোড করুন
-                </p>
-              </button>
-
-              <button
-                onClick={() => {
-                  if (confirm('সতর্কতা: এটি সম্পূর্ণ ডাটাবেজ মুছে ফেলবে! আপনি কি নিশ্চিত?')) {
-                    factoryResetData();
-                  }
-                }}
-                className="p-4 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-2xl text-left transition-all cursor-pointer"
-              >
-                <div className="flex items-center space-x-2 text-rose-800 font-bold text-xs mb-1">
-                  <Trash2 className="w-4 h-4 text-rose-600" />
-                  <span>ফ্যাক্টরি রিসেট (সকল ডাটা মুছুন)</span>
-                </div>
-                <p className="text-[11px] text-rose-600/80">
-                  সতর্কতার সাথে ব্যবহার করুন
-                </p>
-              </button>
             </div>
           </div>
         </div>
@@ -879,66 +788,6 @@ export const SuperAdminView: React.FC = () => {
                 )}
               </tbody>
             </table>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 6: BACKUP & RESTORE */}
-      {activeTab === 'backup' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* Export Card */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                <Download className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-black text-slate-900">ডাটাবেজ এক্সপোর্ট (Export JSON)</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                হাসপাতালের সকল তথ্য (ওষুধের স্টক, ভর্তি ও রিলিজ রোগী, প্রসব রেকর্ড ও অডিট লগ) একটি একক JSON ফাইল হিসেবে আপনার কম্পিউটারে সংরক্ষণ করুন।
-              </p>
-              <button
-                onClick={exportDatabaseJSON}
-                className="w-full py-3 bg-[#1E6BFF] hover:bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition-all cursor-pointer flex items-center justify-center space-x-2"
-              >
-                <Download className="w-4 h-4" />
-                <span>JSON ব্যাকআপ ফাইল ডাউনলোড করুন</span>
-              </button>
-            </div>
-
-            {/* Import / Restore Card */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-2xs space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                <Upload className="w-6 h-6" />
-              </div>
-              <h3 className="text-base font-black text-slate-900">ডাটাবেজ রিস্টোর (Restore JSON)</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                পূর্বে সেভ করা JSON ফাইলের কোড নিচে পেস্ট করে সরাসরি ডাটা রিস্টোর করুন।
-              </p>
-              
-              <textarea
-                rows={3}
-                placeholder="JSON ব্যাকআপ কোড এখানে পেস্ট করুন..."
-                value={importJsonText}
-                onChange={(e) => setImportJsonText(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-[11px] focus:bg-white focus:outline-hidden"
-              />
-
-              {importStatus && (
-                <div className="p-2.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800">
-                  {importStatus}
-                </div>
-              )}
-
-              <button
-                onClick={handleImport}
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all cursor-pointer flex items-center justify-center space-x-2"
-              >
-                <Upload className="w-4 h-4" />
-                <span>ব্যাকআপ ডাটা রিস্টোর করুন</span>
-              </button>
-            </div>
-
           </div>
         </div>
       )}

@@ -5,14 +5,16 @@ import { StaffPortalView } from './views/StaffPortalView';
 import { StaffLoginView } from './views/StaffLoginView';
 import { SuperAdminView } from './views/SuperAdminView';
 import { AdminLoginView } from './views/AdminLoginView';
+import { DeveloperView } from './views/DeveloperView';
+import { DeveloperLoginView } from './views/DeveloperLoginView';
 
 const MainHospitalApp: React.FC = () => {
   const { authRole } = useHospital();
 
-  // Active route: 'public' | 'staff' | 'admin'
-  const [currentRoute, setCurrentRoute] = useState<'public' | 'staff' | 'admin'>('public');
+  // Active route: 'public' | 'staff' | 'admin' | 'dev'
+  const [currentRoute, setCurrentRoute] = useState<'public' | 'staff' | 'admin' | 'dev'>('public');
 
-  // Synchronize route from URL hash (#view, #staff, #admin), path (/staff, /admin), or search (?view=...)
+  // Synchronize route from URL hash (#public, #staff, #admin, #dev), search (?view=...), or path
   useEffect(() => {
     const detectRoute = () => {
       const hash = window.location.hash.toLowerCase();
@@ -21,6 +23,15 @@ const MainHospitalApp: React.FC = () => {
       const path = window.location.pathname.toLowerCase();
 
       if (
+        hash === '#dev' || 
+        hash === '#developer' || 
+        hash === '#dev-login' || 
+        viewParam === 'dev' || 
+        viewParam === 'developer' || 
+        path.endsWith('/dev')
+      ) {
+        setCurrentRoute('dev');
+      } else if (
         hash === '#staff' || 
         hash === '#staff-login' || 
         viewParam === 'staff' || 
@@ -51,7 +62,7 @@ const MainHospitalApp: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F4F7FC] text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900 font-sans">
       
-      {/* LINK 1: Public Live Display View (#public)
+      {/* LINK 1: Public Live Display View (#public or /)
           100% View-Only: Zero Staff or Admin Login buttons */}
       {currentRoute === 'public' && (
         <PublicDisplayView />
@@ -78,6 +89,18 @@ const MainHospitalApp: React.FC = () => {
           </div>
         ) : (
           <AdminLoginView />
+        )
+      )}
+
+      {/* LINK 4: Developer Database & Tools Panel (#dev)
+          Password Protected: If not logged in, prompts for Developer Passcode */}
+      {currentRoute === 'dev' && (
+        authRole === 'developer' ? (
+          <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+            <DeveloperView />
+          </div>
+        ) : (
+          <DeveloperLoginView />
         )
       )}
 
