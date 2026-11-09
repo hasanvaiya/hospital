@@ -20,15 +20,7 @@ import {
 } from 'lucide-react';
 import { useHospital } from '../context/HospitalContext';
 
-interface PublicDisplayViewProps {
-  onOpenStaffPortal: () => void;
-  onOpenSuperAdmin: () => void;
-}
-
-export const PublicDisplayView: React.FC<PublicDisplayViewProps> = ({ 
-  onOpenStaffPortal, 
-  onOpenSuperAdmin 
-}) => {
+export const PublicDisplayView: React.FC = () => {
   const { 
     patients, 
     medicines, 
@@ -70,7 +62,7 @@ export const PublicDisplayView: React.FC<PublicDisplayViewProps> = ({
   return (
     <div className="min-h-screen bg-[#F4F7FC] flex flex-col font-sans">
       
-      {/* Humanized Top Navigation Bar */}
+      {/* Humanized Top Navigation Bar (Pure View - No Login Triggers) */}
       <header className="h-16 bg-white border-b border-[#E5EAF2] px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30 shadow-2xs">
         
         {/* Brand */}
@@ -82,7 +74,7 @@ export const PublicDisplayView: React.FC<PublicDisplayViewProps> = ({
             <div className="flex items-center space-x-2">
               <span className="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">MediCare HMS</span>
               <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#1E6BFF] border border-blue-200">
-                লাইভ ডিসপ্লে বোর্ড
+                হাসপাতাল লাইভ তথ্য বোর্ড
               </span>
             </div>
             <p className="text-[11px] text-slate-500 hidden md:block">
@@ -91,21 +83,10 @@ export const PublicDisplayView: React.FC<PublicDisplayViewProps> = ({
           </div>
         </div>
 
-        {/* 3 Dedicated Section Links: Public, Staff, Super Admin */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <button
-            onClick={onOpenStaffPortal}
-            className="flex items-center space-x-1.5 px-3 sm:px-4 py-2 bg-blue-50 hover:bg-blue-100 text-[#1E6BFF] border border-blue-200 rounded-xl text-xs font-bold transition-all shadow-2xs"
-          >
-            <span>🩺 স্টাফ পোর্টাল</span>
-          </button>
-
-          <button
-            onClick={onOpenSuperAdmin}
-            className="flex items-center space-x-1.5 px-3 sm:px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-2xs"
-          >
-            <span>👑 সুপার এডমিন</span>
-          </button>
+        {/* Live Indicator */}
+        <div className="flex items-center space-x-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 shadow-2xs">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>লাইভ বোর্ড সক্রিয়</span>
         </div>
 
       </header>
@@ -132,13 +113,6 @@ export const PublicDisplayView: React.FC<PublicDisplayViewProps> = ({
                 </p>
               </div>
             </div>
-
-            <button
-              onClick={onOpenStaffPortal}
-              className="px-4 py-1.5 bg-white text-orange-700 hover:bg-orange-50 rounded-xl text-xs font-black shadow-xs shrink-0 self-start sm:self-center"
-            >
-              স্টক আপডেট করুন
-            </button>
           </div>
         )}
 

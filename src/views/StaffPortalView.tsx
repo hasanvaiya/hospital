@@ -23,15 +23,7 @@ import {
 import { useHospital } from '../context/HospitalContext';
 import { DeliveryRecord, Medicine, MedicineCategory, Gender } from '../types';
 
-interface StaffPortalViewProps {
-  onGoToPublicView: () => void;
-  onOpenSuperAdmin: () => void;
-}
-
-export const StaffPortalView: React.FC<StaffPortalViewProps> = ({ 
-  onGoToPublicView,
-  onOpenSuperAdmin
-}) => {
+export const StaffPortalView: React.FC = () => {
   const { 
     logout, 
     medicines, 
@@ -225,30 +217,14 @@ export const StaffPortalView: React.FC<StaffPortalViewProps> = ({
           </div>
         </div>
 
-        {/* Quick Actions & Navigation: 3 Distinct Links */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={onGoToPublicView}
-            className="flex items-center space-x-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-            <span>🌐 সাধারণ ভিউ</span>
-          </button>
-
-          <button
-            onClick={onOpenSuperAdmin}
-            className="flex items-center space-x-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
-          >
-            <UserCheck className="w-3.5 h-3.5 text-amber-400" />
-            <span>👑 সুপার এডমিন</span>
-          </button>
-
+        {/* Quick Actions */}
+        <div>
           <button
             onClick={logout}
-            className="flex items-center space-x-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+            className="flex items-center space-x-1.5 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>লগআউট</span>
+            <LogOut className="w-4 h-4" />
+            <span>লগআউট (Logout)</span>
           </button>
         </div>
       </div>

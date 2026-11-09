@@ -2,124 +2,73 @@ import React, { useState, useEffect } from 'react';
 import { HospitalProvider, useHospital } from './context/HospitalContext';
 import { PublicDisplayView } from './views/PublicDisplayView';
 import { StaffPortalView } from './views/StaffPortalView';
+import { StaffLoginView } from './views/StaffLoginView';
 import { SuperAdminView } from './views/SuperAdminView';
-import { AuthGateModal } from './components/AuthGateModal';
+import { AdminLoginView } from './views/AdminLoginView';
 
 const MainHospitalApp: React.FC = () => {
   const { authRole } = useHospital();
 
-  // Active view: 'public' | 'staff' | 'super_admin'
-  const [currentView, setCurrentView] = useState<'public' | 'staff' | 'super_admin'>('public');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [loginModalTargetRole, setLoginModalTargetRole] = useState<'staff' | 'admin'>('staff');
+  // Active route: 'public' | 'staff' | 'admin'
+  const [currentRoute, setCurrentRoute] = useState<'public' | 'staff' | 'admin'>('public');
 
-  // Synchronize hash in URL for 3 separate direct links (#public, #staff, #admin)
+  // Synchronize route from URL hash (#public, #staff, #admin) or query parameter (?view=...)
   useEffect(() => {
-    const handleHashChange = () => {
+    const detectRoute = () => {
       const hash = window.location.hash.toLowerCase();
-      if (hash === '#staff') {
-        if (authRole === 'staff' || authRole === 'super_admin') {
-          setCurrentView('staff');
-        } else {
-          setLoginModalTargetRole('staff');
-          setIsLoginModalOpen(true);
-        }
-      } else if (hash === '#admin') {
-        if (authRole === 'super_admin') {
-          setCurrentView('super_admin');
-        } else {
-          setLoginModalTargetRole('admin');
-          setIsLoginModalOpen(true);
-        }
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = params.get('view')?.toLowerCase();
+
+      if (hash === '#staff' || viewParam === 'staff') {
+        setCurrentRoute('staff');
+      } else if (hash === '#admin' || viewParam === 'admin') {
+        setCurrentRoute('admin');
       } else {
-        setCurrentView('public');
+        setCurrentRoute('public');
       }
     };
 
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [authRole]);
-
-  // If user logs in as staff or admin, update current view automatically
-  useEffect(() => {
-    if (authRole === 'staff') {
-      setCurrentView('staff');
-      window.location.hash = 'staff';
-    } else if (authRole === 'super_admin') {
-      // If was trying to go to staff or admin, preserve or default to admin
-      if (currentView !== 'staff') {
-        setCurrentView('super_admin');
-        window.location.hash = 'admin';
-      }
-    } else if (authRole === 'public') {
-      setCurrentView('public');
-      window.location.hash = 'public';
-    }
-  }, [authRole]);
-
-  const handleOpenStaffPortal = () => {
-    if (authRole === 'staff' || authRole === 'super_admin') {
-      setCurrentView('staff');
-      window.location.hash = 'staff';
-    } else {
-      setLoginModalTargetRole('staff');
-      setIsLoginModalOpen(true);
-    }
-  };
-
-  const handleOpenSuperAdmin = () => {
-    if (authRole === 'super_admin') {
-      setCurrentView('super_admin');
-      window.location.hash = 'admin';
-    } else {
-      setLoginModalTargetRole('admin');
-      setIsLoginModalOpen(true);
-    }
-  };
-
-  const handleGoToPublic = () => {
-    setCurrentView('public');
-    window.location.hash = 'public';
-  };
+    detectRoute();
+    window.addEventListener('hashchange', detectRoute);
+    window.addEventListener('popstate', detectRoute);
+    return () => {
+      window.removeEventListener('hashchange', detectRoute);
+      window.removeEventListener('popstate', detectRoute);
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#F4F7FC] text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F4F7FC] text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900 font-sans">
       
-      {/* 1. Public Display Section (View-only for everyone) */}
-      {currentView === 'public' && (
-        <PublicDisplayView 
-          onOpenStaffPortal={handleOpenStaffPortal}
-          onOpenSuperAdmin={handleOpenSuperAdmin}
-        />
+      {/* LINK 1: Public Live Display View (#public)
+          100% View-Only: Zero Staff or Admin Login buttons */}
+      {currentRoute === 'public' && (
+        <PublicDisplayView />
       )}
 
-      {/* 2. Staff Portal Section (Protected by Staff 1 Passcode) */}
-      {currentView === 'staff' && (
-        <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-          <StaffPortalView 
-            onGoToPublicView={handleGoToPublic}
-            onOpenSuperAdmin={handleOpenSuperAdmin}
-          />
-        </div>
+      {/* LINK 2: Staff 1 Portal (#staff)
+          Password Protected: If not logged in, prompts for Staff Passcode */}
+      {currentRoute === 'staff' && (
+        authRole === 'staff' || authRole === 'super_admin' ? (
+          <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+            <StaffPortalView />
+          </div>
+        ) : (
+          <StaffLoginView />
+        )
       )}
 
-      {/* 3. Super Admin Section (Protected by Gmail & Password) */}
-      {currentView === 'super_admin' && (
-        <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-          <SuperAdminView 
-            onGoToPublicView={handleGoToPublic}
-            onOpenStaffPortal={handleOpenStaffPortal}
-          />
-        </div>
+      {/* LINK 3: Super Admin Master Panel (#admin)
+          Password Protected: If not logged in, prompts for Admin Email & Password */}
+      {currentRoute === 'admin' && (
+        authRole === 'super_admin' ? (
+          <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+            <SuperAdminView />
+          </div>
+        ) : (
+          <AdminLoginView />
+        )
       )}
-
-      {/* Login Gatekeeper Modal */}
-      <AuthGateModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        defaultRole={loginModalTargetRole}
-      />
 
     </div>
   );

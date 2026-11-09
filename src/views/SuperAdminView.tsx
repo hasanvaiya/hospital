@@ -25,15 +25,7 @@ import {
 import { useHospital } from '../context/HospitalContext';
 import { Medicine, DeliveryRecord, MedicineCategory, Gender } from '../types';
 
-interface SuperAdminViewProps {
-  onGoToPublicView: () => void;
-  onOpenStaffPortal: () => void;
-}
-
-export const SuperAdminView: React.FC<SuperAdminViewProps> = ({ 
-  onGoToPublicView,
-  onOpenStaffPortal
-}) => {
+export const SuperAdminView: React.FC = () => {
   const { 
     logout,
     patients,
@@ -246,29 +238,13 @@ export const SuperAdminView: React.FC<SuperAdminViewProps> = ({
           </div>
         </div>
 
-        {/* Top actions: 3 Distinct Links */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={onGoToPublicView}
-            className="flex items-center space-x-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
-          >
-            <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-            <span>🌐 সাধারণ ভিউ</span>
-          </button>
-
-          <button
-            onClick={onOpenStaffPortal}
-            className="flex items-center space-x-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-blue-200" />
-            <span>🩺 স্টাফ ১ পোর্টাল</span>
-          </button>
-
+        {/* Top actions */}
+        <div>
           <button
             onClick={logout}
-            className="flex items-center space-x-1.5 px-3.5 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+            className="flex items-center space-x-1.5 px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 rounded-xl text-xs font-bold transition-colors cursor-pointer"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut className="w-4 h-4" />
             <span>এডমিন সাইনআউট</span>
           </button>
         </div>
