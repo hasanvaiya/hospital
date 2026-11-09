@@ -12,16 +12,27 @@ const MainHospitalApp: React.FC = () => {
   // Active route: 'public' | 'staff' | 'admin'
   const [currentRoute, setCurrentRoute] = useState<'public' | 'staff' | 'admin'>('public');
 
-  // Synchronize route from URL hash (#public, #staff, #admin) or query parameter (?view=...)
+  // Synchronize route from URL hash (#view, #staff, #admin), path (/staff, /admin), or search (?view=...)
   useEffect(() => {
     const detectRoute = () => {
       const hash = window.location.hash.toLowerCase();
       const params = new URLSearchParams(window.location.search);
       const viewParam = params.get('view')?.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
 
-      if (hash === '#staff' || viewParam === 'staff') {
+      if (
+        hash === '#staff' || 
+        hash === '#staff-login' || 
+        viewParam === 'staff' || 
+        path.endsWith('/staff')
+      ) {
         setCurrentRoute('staff');
-      } else if (hash === '#admin' || viewParam === 'admin') {
+      } else if (
+        hash === '#admin' || 
+        hash === '#admin-login' || 
+        viewParam === 'admin' || 
+        path.endsWith('/admin')
+      ) {
         setCurrentRoute('admin');
       } else {
         setCurrentRoute('public');
